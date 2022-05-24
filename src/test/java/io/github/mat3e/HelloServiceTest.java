@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 
 public class HelloServiceTest {
     private final static String WELCOME = "Hello";
+    private final static String FALLBACK_ID_WELCOME = "Hola";
     @Test
     public void test_prepareGreeting_nullName_returnsGreetingWithFallbackValue() {
         // given
@@ -38,24 +39,41 @@ public class HelloServiceTest {
     @Test
     public void test_prepareGreeting_nullLang_returnsGreetingWithFallbackIdLang() {
         // given
-        var fallbackIdWelcome = "Hola";
-        var mockRepository = new LangRepository() {
-            @Override
-            Optional<Lang> findById(Long id) {
-                if(id.equals(HelloService.FALLBACK_LANG.getId())) {
-                    return Optional.of(new Lang(null, fallbackIdWelcome, null));
-                }
-                return Optional.empty();
-            }
-        };
+        var mockRepository = fallbackLangIdRepository();
         var SUT = new HelloService(mockRepository);
 
         // when
         var result = SUT.prepareGreeting(null,null);
 
         // then
-        assertEquals(fallbackIdWelcome + " " + HelloService.FALLBACK_NAME + "!", result);
+        assertEquals(FALLBACK_ID_WELCOME + " " + HelloService.FALLBACK_NAME + "!", result);
     }
+
+    @Test
+    public void test_prepareGreeting_textLang_returnsGreetingWithFallbackIdLang() {
+        // given
+        var mockRepository = fallbackLangIdRepository();
+        var SUT = new HelloService(mockRepository);
+
+        // when
+        var result = SUT.prepareGreeting(null,"abc");
+
+        // then
+        assertEquals(FALLBACK_ID_WELCOME + " " + HelloService.FALLBACK_NAME + "!", result);
+    }
+
+    private LangRepository fallbackLangIdRepository() {
+        return new LangRepository() {
+            @Override
+            Optional<Lang> findById(Long id) {
+                if (id.equals(HelloService.FALLBACK_LANG.getId())) {
+                    return Optional.of(new Lang(null, FALLBACK_ID_WELCOME, null));
+                }
+                return Optional.empty();
+            }
+        };
+    }
+
     private LangRepository alwaysReturnHelloRepository() {
         return new LangRepository() {
             @Override
