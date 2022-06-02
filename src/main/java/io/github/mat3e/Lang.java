@@ -1,9 +1,27 @@
 package io.github.mat3e;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.GenericGenerator;
+
+@Entity
+@Table(name = "languages")
 class Lang {
+    @Id
+    @GeneratedValue(generator="inc")
+    @GenericGenerator(name="inc", strategy = "increment")
     private Integer id;
     private String welcomeMsg;
     private String code;
+
+    /**
+     * Hibernate (JPA) needs it
+     */
+    Lang() {
+
+    }
 
     public Lang(Integer id, String welcomeMsg, String code) {
         this.id = id;
